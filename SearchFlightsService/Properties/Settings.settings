@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SearchFlightsService.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SearchFlightsService_PortbiletService_GDSWebServiceService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://xml.portbilet.ru:80/vip/ws2</Value>
+    </Setting>
+    <Setting Name="db_user" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">[avalon].[dbo].</Value>
+    </Setting>
+    <Setting Name="connectionString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Data Source=192.168.0.105;Initial Catalog=avalon;User Id=sa;Password=asd321r</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

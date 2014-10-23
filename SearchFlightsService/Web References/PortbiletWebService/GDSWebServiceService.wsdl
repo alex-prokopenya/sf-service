@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws2.vip.server.xtrip.gridnine.com/" name="GDSWebServiceService" targetNamespace="http://ws2.vip.server.xtrip.gridnine.com/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import schemaLocation="http://www.portbilet.ru:9090/vip/ws2?xsd=1" namespace="http://ws2.vip.server.xtrip.gridnine.com/" />
+    </xsd:schema>
+  </types>
+  <message name="getAgents">
+    <part name="parameters" element="tns:getAgents" />
+  </message>
+  <message name="getAgentsResponse">
+    <part name="parameters" element="tns:getAgentsResponse" />
+  </message>
+  <message name="Exception">
+    <part name="fault" element="tns:Exception" />
+  </message>
+  <message name="isAlfastrahEnabled">
+    <part name="parameters" element="tns:isAlfastrahEnabled" />
+  </message>
+  <message name="isAlfastrahEnabledResponse">
+    <part name="parameters" element="tns:isAlfastrahEnabledResponse" />
+  </message>
+  <message name="searchFlights">
+    <part name="parameters" element="tns:searchFlights" />
+  </message>
+  <message name="searchFlightsResponse">
+    <part name="parameters" element="tns:searchFlightsResponse" />
+  </message>
+  <message name="selectFlight">
+    <part name="parameters" element="tns:selectFlight" />
+  </message>
+  <message name="selectFlightResponse">
+    <part name="parameters" element="tns:selectFlightResponse" />
+  </message>
+  <message name="searchRemarks">
+    <part name="parameters" element="tns:searchRemarks" />
+  </message>
+  <message name="searchRemarksResponse">
+    <part name="parameters" element="tns:searchRemarksResponse" />
+  </message>
+  <message name="createBooking">
+    <part name="parameters" element="tns:createBooking" />
+  </message>
+  <message name="createBookingResponse">
+    <part name="parameters" element="tns:createBookingResponse" />
+  </message>
+  <message name="cancelBooking">
+    <part name="parameters" element="tns:cancelBooking" />
+  </message>
+  <message name="cancelBookingResponse">
+    <part name="parameters" element="tns:cancelBookingResponse" />
+  </message>
+  <message name="reprice">
+    <part name="parameters" element="tns:reprice" />
+  </message>
+  <message name="repriceResponse">
+    <part name="parameters" element="tns:repriceResponse" />
+  </message>
+  <message name="issueTickets">
+    <part name="parameters" element="tns:issueTickets" />
+  </message>
+  <message name="issueTicketsResponse">
+    <part name="parameters" element="tns:issueTicketsResponse" />
+  </message>
+  <message name="loadBooking">
+    <part name="parameters" element="tns:loadBooking" />
+  </message>
+  <message name="loadBookingResponse">
+    <part name="parameters" element="tns:loadBookingResponse" />
+  </message>
+  <message name="getCharterCities">
+    <part name="parameters" element="tns:getCharterCities" />
+  </message>
+  <message name="getCharterCitiesResponse">
+    <part name="parameters" element="tns:getCharterCitiesResponse" />
+  </message>
+  <message name="searchCharters">
+    <part name="parameters" element="tns:searchCharters" />
+  </message>
+  <message name="searchChartersResponse">
+    <part name="parameters" element="tns:searchChartersResponse" />
+  </message>
+  <message name="getPolicyPrice">
+    <part name="parameters" element="tns:getPolicyPrice" />
+  </message>
+  <message name="getPolicyPriceResponse">
+    <part name="parameters" element="tns:getPolicyPriceResponse" />
+  </message>
+  <message name="createRefundExchangeRequest">
+    <part name="parameters" element="tns:createRefundExchangeRequest" />
+  </message>
+  <message name="createRefundExchangeRequestResponse">
+    <part name="parameters" element="tns:createRefundExchangeRequestResponse" />
+  </message>
+  <message name="searchMatrix">
+    <part name="parameters" element="tns:searchMatrix" />
+  </message>
+  <message name="searchMatrixResponse">
+    <part name="parameters" element="tns:searchMatrixResponse" />
+  </message>
+  <message name="selectFOP">
+    <part name="parameters" element="tns:selectFOP" />
+  </message>
+  <message name="selectFOPResponse">
+    <part name="parameters" element="tns:selectFOPResponse" />
+  </message>
+  <message name="setWritingAgent">
+    <part name="parameters" element="tns:setWritingAgent" />
+  </message>
+  <message name="setWritingAgentResponse">
+    <part name="parameters" element="tns:setWritingAgentResponse" />
+  </message>
+  <message name="getReport">
+    <part name="parameters" element="tns:getReport" />
+  </message>
+  <message name="getReportResponse">
+    <part name="parameters" element="tns:getReportResponse" />
+  </message>
+  <message name="getCharterFlight">
+    <part name="parameters" element="tns:getCharterFlight" />
+  </message>
+  <message name="getCharterFlightResponse">
+    <part name="parameters" element="tns:getCharterFlightResponse" />
+  </message>
+  <portType name="GDSWebService">
+    <operation name="getAgents">
+      <input message="tns:getAgents" />
+      <output message="tns:getAgentsResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="isAlfastrahEnabled">
+      <input message="tns:isAlfastrahEnabled" />
+      <output message="tns:isAlfastrahEnabledResponse" />
+    </operation>
+    <operation name="searchFlights">
+      <input message="tns:searchFlights" />
+      <output message="tns:searchFlightsResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="selectFlight">
+      <input message="tns:selectFlight" />
+      <output message="tns:selectFlightResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="searchRemarks">
+      <input message="tns:searchRemarks" />
+      <output message="tns:searchRemarksResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="createBooking">
+      <input message="tns:createBooking" />
+      <output message="tns:createBookingResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="cancelBooking">
+      <input message="tns:cancelBooking" />
+      <output message="tns:cancelBookingResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="reprice">
+      <input message="tns:reprice" />
+      <output message="tns:repriceResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="issueTickets">
+      <input message="tns:issueTickets" />
+      <output message="tns:issueTicketsResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="loadBooking">
+      <input message="tns:loadBooking" />
+      <output message="tns:loadBookingResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="getCharterCities">
+      <input message="tns:getCharterCities" />
+      <output message="tns:getCharterCitiesResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="searchCharters">
+      <input message="tns:searchCharters" />
+      <output message="tns:searchChartersResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="getPolicyPrice">
+      <input message="tns:getPolicyPrice" />
+      <output message="tns:getPolicyPriceResponse" />
+    </operation>
+    <operation name="createRefundExchangeRequest">
+      <input message="tns:createRefundExchangeRequest" />
+      <output message="tns:createRefundExchangeRequestResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="searchMatrix">
+      <input message="tns:searchMatrix" />
+      <output message="tns:searchMatrixResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="selectFOP">
+      <input message="tns:selectFOP" />
+      <output message="tns:selectFOPResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="setWritingAgent">
+      <input message="tns:setWritingAgent" />
+      <output message="tns:setWritingAgentResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="getReport">
+      <input message="tns:getReport" />
+      <output message="tns:getReportResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+    <operation name="getCharterFlight">
+      <input message="tns:getCharterFlight" />
+      <output message="tns:getCharterFlightResponse" />
+      <fault name="Exception" message="tns:Exception" />
+    </operation>
+  </portType>
+  <binding name="GDSWebServicePortBinding" type="tns:GDSWebService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="getAgents">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="isAlfastrahEnabled">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="searchFlights">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="selectFlight">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="searchRemarks">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="createBooking">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="cancelBooking">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="reprice">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="issueTickets">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="loadBooking">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getCharterCities">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="searchCharters">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getPolicyPrice">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="createRefundExchangeRequest">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="searchMatrix">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="selectFOP">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="setWritingAgent">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getReport">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getCharterFlight">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="Exception">
+        <soap:fault use="literal" name="Exception" namespace="" />
+      </fault>
+    </operation>
+  </binding>
+  <service name="GDSWebServiceService">
+    <port name="GDSWebServicePort" binding="tns:GDSWebServicePortBinding">
+      <soap:address location="http://www.portbilet.ru:9090/vip/ws2" />
+    </port>
+  </service>
+</definitions>

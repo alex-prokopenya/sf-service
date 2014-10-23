@@ -1,0 +1,622 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BD76149E-2386-4DE8-BB05-EDCE88FB43CF}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SearchFlightsService</RootNamespace>
+    <AssemblyName>SearchFlightsService</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <UseIISExpress>false</UseIISExpress>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AgentService">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\AgentService.dll</HintPath>
+    </Reference>
+    <Reference Include="AjaxControlToolkit">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\AjaxControlToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="antlr.runtime">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\antlr.runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="baseplugins">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\baseplugins.dll</HintPath>
+    </Reference>
+    <Reference Include="blowery.Web.HttpCompress">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\blowery.Web.HttpCompress.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="ComponentFactory.Krypton.Docking">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\ComponentFactory.Krypton.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="ComponentFactory.Krypton.Navigator">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\ComponentFactory.Krypton.Navigator.dll</HintPath>
+    </Reference>
+    <Reference Include="ComponentFactory.Krypton.Ribbon">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\ComponentFactory.Krypton.Ribbon.dll</HintPath>
+    </Reference>
+    <Reference Include="ComponentFactory.Krypton.Toolkit">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\ComponentFactory.Krypton.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="ComponentFactory.Krypton.Workspace">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\ComponentFactory.Krypton.Workspace.dll</HintPath>
+    </Reference>
+    <Reference Include="ESystem.Protocol">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\ESystem.Protocol.dll</HintPath>
+    </Reference>
+    <Reference Include="IGERSoft.WebControls">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\IGERSoft.WebControls.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Jayrock, Version=0.9.12915.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\from downloads\jayrock-0.9.12915-all\bin\net-4.0\debug\Jayrock.dll</HintPath>
+    </Reference>
+    <Reference Include="Jayrock.Json, Version=0.9.12915.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\from downloads\jayrock-0.9.12915-all\bin\net-4.0\debug\Jayrock.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWeb">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWeb.Plugins.Agent">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWeb.Plugins.Agent.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWeb.Plugins.Reports">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWeb.Plugins.Reports.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWeb.RSS">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWeb.RSS.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWebStandard.Extra.AviaQuotes">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWebStandard.Extra.AviaQuotes.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWebStandard.Extra.ComplexTour">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWebStandard.Extra.ComplexTour.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWebStandard.Extra.HotelQuotes">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWebStandard.Extra.HotelQuotes.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWebStandard.Extra.JavaScriptSearch">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWebStandard.Extra.JavaScriptSearch.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWebStandard.Extra.QuotedDynamic">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWebStandard.Extra.QuotedDynamic.dll</HintPath>
+    </Reference>
+    <Reference Include="MasterWebStandard.Extra.ServiceStatus">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\MasterWebStandard.Extra.ServiceStatus.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.ApplicationContainer">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.ApplicationContainer.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Binding">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Binding.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Common">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Common.BusinessRules">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Common.BusinessRules.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Common.Model">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.CommonInterfaces">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.CommonInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Configuration">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.ContextData">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.ContextData.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Cryptography, Version=1.3.0.70, Culture=neutral, PublicKeyToken=e8a85c0485bf578b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Data">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Data.Web">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Data.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Dispatchers">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Dispatchers.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Framework.Plugins">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Framework.Plugins.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Loading">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Loading.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Localizer, Version=9.2.12.19964, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Localizer.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Localizer.resources">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Localizer.resources.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.Bonuses">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.Bonuses.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.BusinessRules">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.BusinessRules.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.DataAccess, Version=1.3.3.370, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.Model">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.ReportCore">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.ReportCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.ReportLogic">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.ReportLogic.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.ReportUseGenerator">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.ReportUseGenerator.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.Types, Version=9.2.12.19964, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="megatec.mastertour.utils">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\megatec.mastertour.utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.Web">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterTour.Web.UI.WebControls">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterTour.Web.UI.WebControls.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.AviaBooking">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.AviaBooking.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.Controls">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.Data">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.DomainEntities">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.DomainEntities.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.Loading">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.Loading.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.Logic">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.Logic.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.ReportLogic">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.ReportLogic.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.Repositories">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.Repositories.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.MasterWeb.XmlResources">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.MasterWeb.XmlResources.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Penalties">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Penalties.dll</HintPath>
+    </Reference>
+    <Reference Include="megatec.presentation">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\megatec.presentation.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Presentation.Web">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Presentation.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Search">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Search.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Search.Binding">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Search.Binding.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Search.DistributedSearch">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Search.DistributedSearch.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Security">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Services">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Source">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Source.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Travel.DataObjects">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Travel.DataObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Travel.Entities">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Travel.Entities.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Types">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Web.Caching">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Web.Caching.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Web.Configuration">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Web.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Web.Controls">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Web.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Web.Services.Proxies">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Web.Services.Proxies.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Web.Services.Security">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Web.Services.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Web.Utils">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Web.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Megatec.Web.XmlSerializers">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Megatec.Web.XmlSerializers.dll</HintPath>
+    </Reference>
+    <Reference Include="mysql.data">
+      <HintPath>..\..\MySqlConnect2\MySqlConnect2\bin\Debug\mysql.data.dll</HintPath>
+    </Reference>
+    <Reference Include="mysql.data.entity">
+      <HintPath>..\..\MySqlConnect2\MySqlConnect2\bin\Debug\mysql.data.entity.dll</HintPath>
+    </Reference>
+    <Reference Include="mysql.visualstudio">
+      <HintPath>..\..\MySqlConnect2\MySqlConnect2\bin\Debug\mysql.visualstudio.dll</HintPath>
+    </Reference>
+    <Reference Include="mysql.web">
+      <HintPath>..\..\MySqlConnect2\MySqlConnect2\bin\Debug\mysql.web.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Basics">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Basics.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting.Export.CSV">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.Export.CSV.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting.Export.Excel">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.Export.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting.Export.ExcelXML">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.Export.ExcelXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting.Export.Html">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.Export.Html.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting.Export.PDF">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.Export.PDF.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting.Export.RTF">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.Export.RTF.dll</HintPath>
+    </Reference>
+    <Reference Include="NineRays.Reporting.Web">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NineRays.Reporting.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="Nullables">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Nullables.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Charts">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Charts.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Framework">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Framework.Export">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Framework.Export.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Framework.Model">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Framework.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Instrumentation">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Instrumentation.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Export.Csv">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Export.Csv.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Export.Excel">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Export.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Export.ExcelXml">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Export.ExcelXml.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Export.Html">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Export.Html.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Export.Pdf">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Export.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Export.Rtf">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Export.Rtf.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Web">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Reporting.Web.WebReportViewer">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Reporting.Web.WebReportViewer.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Writers.Excel">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Writers.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Writers.Flash">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Writers.Flash.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Writers.Pdf">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Writers.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="PerpetuumSoft.Writers.Svg">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\PerpetuumSoft.Writers.Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="RJS.Web.WebControl.PopCalendar.Ajax.Net">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\RJS.Web.WebControl.PopCalendar.Ajax.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="RSS.NET">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\RSS.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Aop">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Spring.Aop.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Spring.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Services">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Spring.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="TourMLEngine">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\TourMLEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Validators">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Validators.dll</HintPath>
+    </Reference>
+    <Reference Include="VE.Plugins.Report_prilog">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\VE.Plugins.Report_prilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Viziteurope.Plugins.Voucher">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\Viziteurope.Plugins.Voucher.dll</HintPath>
+    </Reference>
+    <Reference Include="WebControlCaptcha">
+      <HintPath>..\..\..\..\..\Downloads\bin2009\WebControlCaptcha.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SF_service.asmx" />
+    <Content Include="VizitFlights.asmx" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Code\SF_service.asmx.cs">
+      <SubType>Component</SubType>
+    </Content>
+    <Compile Include="Containers\FlightRules.cs" />
+    <Compile Include="Containers\Customer.cs" />
+    <Compile Include="Containers\Direction.cs" />
+    <Compile Include="Containers\Fare.cs" />
+    <Compile Include="Containers\Flight.cs" />
+    <Compile Include="Containers\FlightDetails.cs" />
+    <Compile Include="Containers\FlightPart.cs" />
+    <Compile Include="Containers\JSON\FlightJson.cs" />
+    <Compile Include="Containers\JSON\Query.cs" />
+    <Compile Include="Containers\JSON\QuerySegment.cs" />
+    <Compile Include="Containers\JSON\RouteJson.cs" />
+    <Compile Include="Containers\JSON\SegmentJson.cs" />
+    <Compile Include="Containers\JSON\TicketJson.cs" />
+    <Compile Include="Containers\Leg.cs" />
+    <Compile Include="Containers\Passenger.cs" />
+    <Compile Include="Containers\PriceLink.cs" />
+    <Compile Include="Containers\Route.cs" />
+    <Compile Include="Containers\SearchFlightException.cs" />
+    <Compile Include="Containers\SearchResult.cs" />
+    <Compile Include="Containers\RouteSegment.cs" />
+    <Compile Include="Containers\SearchResultFlights.cs" />
+    <Compile Include="Containers\SearchResultFlightsJson.cs" />
+    <Compile Include="Containers\SearchResultJson.cs" />
+    <Compile Include="Containers\Variant.cs" />
+    <Compile Include="Core\FlightsComparer.cs" />
+    <Compile Include="Core\FlightsToFareProcessor.cs" />
+    <Compile Include="Core\RamblerAviaException.cs" />
+    <Compile Include="DB\DataStore.cs" />
+    <Compile Include="Ext\AwadService.cs" />
+    <Compile Include="Ext\BiletixService.cs" />
+    <Compile Include="Ext\IExternalService.cs" />
+    <Compile Include="Ext\PortbiletService.cs" />
+    <Compile Include="Ext\RamblerService.cs" />
+    <Compile Include="Ext\VizitService.cs" />
+    <Compile Include="json_service\Book.cs" />
+    <Compile Include="json_service\Flight_reduced.cs" />
+    <Compile Include="json_service\Query.cs" />
+    <Compile Include="json_service\QuerySegment.cs" />
+    <Compile Include="json_service\Route_reduced.cs" />
+    <Compile Include="json_service\Segment_reduced.cs" />
+    <Compile Include="json_service\Ticket_reduced.cs" />
+    <Compile Include="Logger\Logger.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VizitFlights.asmx.cs">
+      <DependentUpon>VizitFlights.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Web References\PortbiletWebService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://www.portbilet.ru:9090/vip/ws2%3fwsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\PortbiletWebService\</RelPath>
+      <UpdateFromURL>http://www.portbilet.ru:9090/vip/ws2%3fwsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>SearchFlightsService_PortbiletService_GDSWebServiceService</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AviaApi.ashx" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\PortbiletWebService\AlfastrahEnabledResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\PortbiletWebService\BookingCreateResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <Content Include="Web References\PortbiletWebService\CharterCitiesResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\PortbiletWebService\CharterSearchResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <None Include="Web References\PortbiletWebService\FareRemarksSearchResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\PortbiletWebService\FlightSearchResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <Content Include="Web References\PortbiletWebService\FlightSelectResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <None Include="Web References\PortbiletWebService\GDSWebServiceService.wsdl" />
+    <None Include="Web References\PortbiletWebService\GetAgetntsResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\PortbiletWebService\GetPolicyPriceResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\PortbiletWebService\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="Web References\PortbiletWebService\reportResultWS.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <None Include="Web References\PortbiletWebService\ReservationOpResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\PortbiletWebService\SetWritingAgentResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\PortbiletWebService\ws2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>54321</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost/SearchFlightsService</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>http://localhost/SearchFlightsService</IISAppRootUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
