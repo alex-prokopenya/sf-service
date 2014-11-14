@@ -317,7 +317,7 @@ namespace SearchFlightsService.Ext
         return new Flight { Airline = (tss[0].SubService as Charter).Airline.Name, AirlineCode = parts[0].Legs[0].Airline, Id = flightToken, Key = places.ToString(), Parts = parts, Price = Convert.ToInt32(Math.Ceiling(price)), TimeLimit = DateTime.Now.AddHours(4).ToString("yyyy-MM-dd HH:00:00") };
     }
 
-    public Flight[] Get_Flights(string search_id)
+    public Flight[] GetFlights(string search_id)
     {
         return this.flights;
     }

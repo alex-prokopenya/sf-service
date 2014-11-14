@@ -42,6 +42,11 @@ namespace SearchFlightsService.Logger
         {
             try
             {
+                #if DEBUG
+                Console.WriteLine(message);
+                return;
+                #endif
+
                 StreamWriter outfile = new StreamWriter("" + AppDomain.CurrentDomain.BaseDirectory + @"/log/" + DateTime.Today.ToString("yyyy-MM-dd") + ".log", true);
                 {
                     outfile.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " " + message);
@@ -61,7 +66,13 @@ namespace SearchFlightsService.Logger
                     outfile.WriteLine();
                     outfile.Write(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                     foreach (string message in messages)
+                    {
+                        #if DEBUG
+                                                Console.WriteLine(message);
+                                                continue;
+                        #endif
                         outfile.WriteLine(message);
+                    }
                 }
                 outfile.Close();
             }

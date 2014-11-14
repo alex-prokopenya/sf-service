@@ -44,7 +44,7 @@ namespace SearchFlightsService
 
                 //если еще не получен результат, пробуем получить от Визита
                 if (flightsVizit == null)
-                    flightsVizit = vsrvc.Get_Flights("");
+                    flightsVizit = vsrvc.GetFlights("");
 
                 //если получили оба, уходим
                 if ((flightsVizit != null))

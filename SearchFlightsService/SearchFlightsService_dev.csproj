@@ -456,6 +456,7 @@
     <Content Include="App_Code\SF_service.asmx.cs">
       <SubType>Component</SubType>
     </Content>
+    <Compile Include="Containers\FileContainer.cs" />
     <Compile Include="Containers\FlightRules.cs" />
     <Compile Include="Containers\Customer.cs" />
     <Compile Include="Containers\Direction.cs" />
@@ -479,16 +480,16 @@
     <Compile Include="Containers\SearchResultFlights.cs" />
     <Compile Include="Containers\SearchResultFlightsJson.cs" />
     <Compile Include="Containers\SearchResultJson.cs" />
+    <Compile Include="Containers\TicketInfo.cs" />
     <Compile Include="Containers\Variant.cs" />
     <Compile Include="Core\FlightsComparer.cs" />
     <Compile Include="Core\FlightsToFareProcessor.cs" />
     <Compile Include="Core\RamblerAviaException.cs" />
     <Compile Include="DB\DataStore.cs" />
     <Compile Include="Ext\AwadService.cs" />
-    <Compile Include="Ext\BiletixService.cs" />
     <Compile Include="Ext\IExternalService.cs" />
     <Compile Include="Ext\PortbiletService.cs" />
-    <Compile Include="Ext\RamblerService.cs" />
+    <Compile Include="Ext\TicketsUa.cs" />
     <Compile Include="Ext\VizitService.cs" />
     <Compile Include="json_service\Book.cs" />
     <Compile Include="json_service\Flight_reduced.cs" />

@@ -9,12 +9,17 @@ using System.Net;
 using System.Xml;
 using SearchFlightsService.Logger;
 using System.Web.Configuration;
-
+using System.IO;
+using SearchFlightsService;
+using System.Configuration;
 
 namespace SearchFlightsService.Ext
 {
     public class AwadService : IExternalService
     {
+        private string ticket_folder = WebConfigurationManager.AppSettings["TempFolder"];
+
+
         #region Constants
         private const string AWAD_ApiPath = "http://api.anywayanyday.com";
         private const string AWAD_InitSearch = "/api/NewRequest/?Route=";
@@ -24,20 +29,122 @@ namespace SearchFlightsService.Ext
         private const string AWAD_Details = "/api/Fare/?C=RUR&R=";
         private const string AWAD_Confirmed = "/api/ConfirmFare/?R=";
         private const string AWAD_CreateReservation = "/api/CreateReservation/?";
+        private const string AWAD_Pay_Order = "/api/PayReservation/?OrderId=";
         private const string AWAD_Order = "/api/GetOrder/?OrderId=";
+
         private static string AWAD_PartnerKey = "&Partner=clickandtravel76";//clickandtravel76";
+
+        private decimal TOTAL_COEF = Convert.ToDecimal(ConfigurationManager.AppSettings["TOTAL_COEF"]);
 
         #endregion
 
         private string request_id = "";
 
         #region Public methods
-        public string InitSearch(Route route, int adult, int children, int inf, string serviceClass)
+
+        public TicketInfo GetTicketInfo(string bookId)
         {
-            return awadInitSearch( route,  adult,  children,  inf,  serviceClass);
+            string orderId = bookId.Replace("aw_", "");
+
+            XmlDocument orderDoc = new XmlDocument();
+            orderDoc.LoadXml(makeHttpRequest(AWAD_ApiPath + AWAD_Order + orderId));
+            XmlNodeList orderList = orderDoc.GetElementsByTagName("Order");
+
+            if (orderList.Count == 0) return null;
+
+            XmlElement orderElement = (orderList[0] as XmlElement);
+
+            //получить стоимость
+            decimal total_price = Convert.ToDecimal(orderElement.GetAttribute("Amount").ToString().Replace(".", ","));
+
+            string turist_name = orderElement.GetElementsByTagName("LastName")[0].InnerText;
+            string route_from = (orderElement.GetElementsByTagName("Leg")[0] as XmlElement).GetAttribute("FN").ToString();
+            string route_to = "/";
+
+            //количество туристов
+            int tst_count = orderElement.GetElementsByTagName("Ticket").Count;
+
+            //статус заказа
+            bool isBooking = (orderElement.GetAttribute("Status").ToString() == "WaitingCustomerConfirm");
+
+
+            return new TicketInfo()
+            {
+                MainTurist = turist_name,
+                TuristCount = tst_count,
+                RouteFrom = route_from,
+                RouteTo = route_to,
+                RubPrice = Convert.ToInt32(total_price),
+                IsBooking = isBooking
+            };
         }
 
-        public Flight[] Get_Flights(string search_id)
+        public string BuyTicket(string bookId)
+        {
+            string orderId = bookId.Replace("aw_", "");
+
+            XmlDocument orderDoc = new XmlDocument();
+            string response = makeHttpRequest(AWAD_ApiPath + AWAD_Pay_Order + orderId);
+            orderDoc.LoadXml(response);
+
+            Logger.Logger.WriteToLog("AWAD_PAY_RESPONE:" + response);
+
+            XmlNodeList orderList = orderDoc.GetElementsByTagName("PayReservation");
+
+            if (orderList.Count == 0) return null;
+
+            XmlElement orderElement = (orderList[0] as XmlElement);
+
+            if (orderElement.HasAttribute("Status") && (orderElement.GetAttribute("Status") == "SUCCESSFUL"))
+                return "Success";
+
+            return "Error. " + response;
+        }
+
+        public FileContainer[] SaveTicketToTempFolder(string bookId)
+        {
+            try
+            {
+                string orderId = bookId.Replace("aw_", "");
+
+                string path_template = "https://old.anywayanyday.com/en/order/receipt/?Compact=True&OrderId={order_id}";
+                string url = path_template.Replace("{order_id}", orderId);
+
+                string file_path = this.ticket_folder + "\\" + bookId + ".html";
+                StreamWriter sw = new StreamWriter(file_path);
+
+                WebClient wcl = new WebClient();
+                string ticket = wcl.DownloadString(url);
+
+                ticket = ticket.Replace("/images/logo_text.png", "http://clickandtravel.ru/rg_images/logo_clickandtravel.png")
+                               .Replace("anywayanyday.com", "clickandtravel.ru")
+                               .Replace("anywayanyday", "clickandtravel")
+                               .Replace("width=\"288\"", "")
+                               .Replace("class=\"for_print\" style=\"", "class=\"for_print\" style=\"font-size:260%; padding: 0 5px 5px 0; font-weight: bold; font-family: Tahoma, sans-serif; color#333\">www.clickandtravel.ru</div><div style=\"display:none;")
+                               .Replace("/images/icoPrint_white.gif", "http://clickandtravel.ru/rg_images/icoPrint_white.gif")
+                               .Replace("\">Print</", "font-size:150%\">Распечатать</")
+                               .Replace("<span style=\"color:#F04B7D;\">any</span><span style=\"color:#323741\">way</span><span style=\"color:#F04B7D;\">any</span><span style=\"color:#323741\">day</span>", "<img src=\"http://clickandtravel.ru/rg_images/logo_clickandtravel.png\"/>")
+                               .Replace("height=\"50\"", "");
+
+                sw.Write(ticket);
+                sw.Flush();
+                sw.Close();
+
+                return new FileContainer[] { new FileContainer() { FilePath = file_path, FileTitle = "Авиабилет" } };
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.WriteToLog("save ticket exception: " + ex.Message + "\n" + ex.StackTrace);
+                return new FileContainer[0];
+            }
+        }
+
+        public string InitSearch(Route route, int adult, int children, int inf, string serviceClass)
+        {
+            return awadInitSearch(route, adult, children, inf, serviceClass);
+        }
+
+        public Flight[] GetFlights(string search_id)
         {
             return FaresToFlights(Get_Fares(this.request_id));
         }
@@ -66,10 +173,11 @@ namespace SearchFlightsService.Ext
 
                 ///PAYU!!!!
                 fare.Price = Convert.ToInt32(el.GetAttribute("TotalAmount"));
+                fare.Price = Convert.ToInt32(Math.Ceiling(fare.Price * TOTAL_COEF));
 
                 //применяем наценку, в зависимости от стоимость билета
                 // if (fare.Price < 15500)
-                  //  fare.Price = Convert.ToInt32(Math.Ceiling(fare.Price * 1.02));
+                //  fare.Price = Convert.ToInt32(Math.Ceiling(fare.Price * 1.02));
                 //else if (fare.Price < 24800)
                 //    fare.Price = Convert.ToInt32(Math.Ceiling(fare.Price * 1.005));
 
@@ -93,8 +201,8 @@ namespace SearchFlightsService.Ext
 
         public string BookFlight(string flightId, Customer customer, Passenger[] passengers)
         {
-            string[] arr = flightId.Replace("~","_").Split('_');
-            string requestStr = "R=" + arr[1] + "&F=" + arr[2] + "&V=" + arr[3].Replace("^",";").TrimEnd(new char[]{';'});
+            string[] arr = flightId.Replace("~", "_").Split('_');
+            string requestStr = "R=" + arr[1] + "&F=" + arr[2] + "&V=" + arr[3].Replace("^", ";").TrimEnd(new char[] { ';' });
             string customerSrt = "&Phone=" + customer.Phone + "&Email=" + customer.Mail + "&PhoneCountry=RU|7&PersonalEmail=it@viziteurope.eu";
 
             requestStr += customerSrt;
@@ -104,17 +212,17 @@ namespace SearchFlightsService.Ext
                 if (passengers[i].Citizen.Length > 2)
                     passengers[i].Citizen = passengers[i].Citizen.Substring(2);
 
-                requestStr += "&FName"      + (i + 1) + "=" + passengers[i].Name +
-                              "&LName"      + (i + 1) + "=" + passengers[i].Fname +
-                              "&PCountry"   + (i + 1) + "=" + passengers[i].Citizen +
-                              "&G"          + (i + 1) + "=" + passengers[i].Gender +
-                              "&BDate"      + (i + 1) + "=" + passengers[i].Birth.ToString("dd.MM.yyyy") +
-                              "&PNumber"    + (i + 1) + "=" + passengers[i].Pasport +
-                              "&PExpDate"   + (i + 1) + "=" + passengers[i].Passport_expire_date.ToString("dd.MM.yyyy");
+                requestStr += "&FName" + (i + 1) + "=" + passengers[i].Name +
+                              "&LName" + (i + 1) + "=" + passengers[i].Fname +
+                              "&PCountry" + (i + 1) + "=" + passengers[i].Citizen +
+                              "&G" + (i + 1) + "=" + passengers[i].Gender +
+                              "&BDate" + (i + 1) + "=" + passengers[i].Birth.ToString("dd.MM.yyyy") +
+                              "&PNumber" + (i + 1) + "=" + passengers[i].Pasport +
+                              "&PExpDate" + (i + 1) + "=" + passengers[i].Passport_expire_date.ToString("dd.MM.yyyy");
 
                 if ((passengers[i].FrequentFlyerAirline != null) && (passengers[i].FrequentFlyerNumber != null) && (passengers[i].FrequentFlyerAirline.Length * passengers[i].FrequentFlyerNumber.Length != 0))
-                    requestStr +=  "&FrequentFlyerAirline" + (i + 1) + passengers[i].FrequentFlyerAirline +
-                                   "&FrequentFlyerNumber"  + (i + 1) + passengers[i].FrequentFlyerNumber;
+                    requestStr += "&FrequentFlyerAirline" + (i + 1) + passengers[i].FrequentFlyerAirline +
+                                   "&FrequentFlyerNumber" + (i + 1) + passengers[i].FrequentFlyerNumber;
             }
 
             XmlDocument xDoc = new XmlDocument();
@@ -151,8 +259,8 @@ namespace SearchFlightsService.Ext
                     return "can not book";
                 }
                 //узнать таймлимит
-                
-                return "aw_" + (orderList[0] as XmlElement).GetAttribute("IdentifierNumber").ToString() + "@@@" + orderId;
+
+                return "aw_" + orderId;//+ (orderList[0] as XmlElement).GetAttribute("IdentifierNumber").ToString();
             }
             else
                 if ((nList[0] as XmlElement).GetAttribute("Error").ToString() == "CANT_CREATE_RESERVATION")
@@ -214,25 +322,27 @@ namespace SearchFlightsService.Ext
                 var header = nodeItem.GetElementsByTagName("Header")[0] as XmlElement;
 
                 CBD &= header.GetAttribute("CBD") == "true";
-                CAD &= header.GetAttribute("CBD") == "true";
+                CAD &= header.GetAttribute("CAD") == "true";
                 RBD &= header.GetAttribute("RBD") == "true";
                 RAD &= header.GetAttribute("RAD") == "true";
 
                 rulesText += depCity + " - " + arrCity + "<br>\n<br>\n" + nodeItem.GetElementsByTagName("Rules")[0].InnerText + "<br>\n<br>\n<br>\n<br>\n";
             }
 
-            return new FlightRules() { AllowedChangesAfter = CAD,
-                                        AllowedChangesBefore = CBD,
-                                        AllowedReturnAfter = RAD,
-                                        AllowedReturnBefore = RBD,
-                                        RulesText = rulesText};
+            return new FlightRules()
+            {
+                AllowedChangesAfter = CAD,
+                AllowedChangesBefore = CBD,
+                AllowedReturnAfter = RAD,
+                AllowedReturnBefore = RBD,
+                RulesText = rulesText
+            };
         }
-
         public string Get_Fare_TimeLimit(string flightId)
         {
             //берем параметры тарифа и вариант перелета
-            string[] arr = flightId.Replace("~","_").Split('_');
-            string requestStr = arr[1] + "&F=" + arr[2] + "&V=" + arr[3].Replace("^", ";").TrimEnd(new char[]{';'});
+            string[] arr = flightId.Replace("~", "_").Split('_');
+            string requestStr = arr[1] + "&F=" + arr[2] + "&V=" + arr[3].Replace("^", ";").TrimEnd(new char[] { ';' });
 
             //делаем запрос
             XmlDocument xDoc = new XmlDocument();
@@ -267,7 +377,7 @@ namespace SearchFlightsService.Ext
             Variant variant = new Variant();
             variant.FlightTime = _var.GetAttribute("TT").ToString();
 
-            string time = variant.FlightTime.TrimStart(new char[]{'0'});
+            string time = variant.FlightTime.TrimStart(new char[] { '0' });
             time = time.Replace(":", " ч. ") + " мин.";
 
             variant.FlightTime = time;
@@ -343,7 +453,7 @@ namespace SearchFlightsService.Ext
             try
             {
                 MyWebClient wc = new MyWebClient(timer);
-               // wc.webre
+                // wc.webre
                 return wc.DownloadString(path);
             }
             catch (Exception ex)
@@ -380,7 +490,7 @@ namespace SearchFlightsService.Ext
 
             XmlDocument xDoc = new XmlDocument();
             // отправляем запрос на поиск
-            xDoc.LoadXml(makeHttpRequest(AWAD_ApiPath + AWAD_InitSearch + request , 45));
+            xDoc.LoadXml(makeHttpRequest(AWAD_ApiPath + AWAD_InitSearch + request, 45));
 
             try
             {
@@ -396,7 +506,7 @@ namespace SearchFlightsService.Ext
                 Logger.Logger.WriteToLog("AWAD INIT Exception for request: " + AWAD_ApiPath + AWAD_InitSearch + request + "  " + ex.Message + " " + ex.StackTrace);
                 this.request_id = "";
                 return "";
-               // throw new Exception("Exception while init search " + ex.Message + "\n" + ex.StackTrace + "\n\n" + xDoc.InnerXml);
+                // throw new Exception("Exception while init search " + ex.Message + "\n" + ex.StackTrace + "\n\n" + xDoc.InnerXml);
             }
         }
 
@@ -445,16 +555,16 @@ namespace SearchFlightsService.Ext
                 fl.TimeLimit = "";
                 //цена из тарифа
                 fl.Price = fare.Price;
-                
+
                 //задаем количество участков маршрута
                 fl.Parts = new FlightPart[vars.Length];
 
                 //айдишник формируется из айдишника тарифа + айдишников используемых вариантов
-                string id = fare.Id+"~";
-                for(int j = 0; j < vars.Length; j++)
+                string id = fare.Id + "~";
+                for (int j = 0; j < vars.Length; j++)
                 {
-                    id += vars[j].Id+";";
-                    fl.Parts[j]= new FlightPart(vars[j].Legs, CalcDuration(vars[j].FlightTime));
+                    id += vars[j].Id + ";";
+                    fl.Parts[j] = new FlightPart(vars[j].Legs, CalcDuration(vars[j].FlightTime));
                 }
                 fl.Id = id;
                 flights.Add(fl);
@@ -464,7 +574,7 @@ namespace SearchFlightsService.Ext
 
         private int CalcDuration(string flightTime)
         {
-            flightTime = flightTime.Replace(" ч. ", ":").Replace(" мин.","");
+            flightTime = flightTime.Replace(" ч. ", ":").Replace(" мин.", "");
 
             string[] arr_str = flightTime.Split(':');
 
@@ -473,10 +583,10 @@ namespace SearchFlightsService.Ext
             if (arr_str.Length > 1)
             {
                 if (arr_str[0].TrimStart(new char[] { '0' }).Length > 0)
-                    res+= Convert.ToInt32(arr_str[0].TrimStart(new char[] { '0' })) * 60;
+                    res += Convert.ToInt32(arr_str[0].TrimStart(new char[] { '0' })) * 60;
 
                 if (arr_str[1].TrimStart(new char[] { '0' }).Length > 0)
-                    res+= Convert.ToInt32(arr_str[1].TrimStart(new char[] { '0' })) ;
+                    res += Convert.ToInt32(arr_str[1].TrimStart(new char[] { '0' }));
 
                 return res;
             }
@@ -487,12 +597,12 @@ namespace SearchFlightsService.Ext
         private Variant[][] mixVariants(Direction[] directions)
         {
             if (directions.Length == 1)
-            { 
+            {
                 Direction dir = directions[0];
                 Variant[][] mix = new Variant[dir.Variants.Length][];
 
-                for(int i=0; i<dir.Variants.Length; i++)
-                    mix[i] = new Variant[1]{dir.Variants[i]};
+                for (int i = 0; i < dir.Variants.Length; i++)
+                    mix[i] = new Variant[1] { dir.Variants[i] };
 
                 return mix;
             }

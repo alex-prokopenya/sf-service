@@ -12,6 +12,6 @@ namespace SearchFlightsService.Ext
 
         FlightDetails[] GetFlightDetails(string flightToken);
         
-        Flight[] Get_Flights(string search_id);
+        Flight[] GetFlights(string search_id);
     }
 }

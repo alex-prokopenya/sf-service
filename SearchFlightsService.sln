@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20827.3
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchFlightsService_dev", "SearchFlightsService\SearchFlightsService_dev.csproj", "{BD76149E-2386-4DE8-BB05-EDCE88FB43CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "consoleTest", "consoleTest\consoleTest.csproj", "{DBD9983C-021C-4C9B-8F91-3D0EEB1E9315}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BD76149E-2386-4DE8-BB05-EDCE88FB43CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD76149E-2386-4DE8-BB05-EDCE88FB43CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD76149E-2386-4DE8-BB05-EDCE88FB43CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD9983C-021C-4C9B-8F91-3D0EEB1E9315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD9983C-021C-4C9B-8F91-3D0EEB1E9315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD9983C-021C-4C9B-8F91-3D0EEB1E9315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD9983C-021C-4C9B-8F91-3D0EEB1E9315}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

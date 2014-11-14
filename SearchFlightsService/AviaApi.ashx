@@ -130,7 +130,7 @@ namespace SearchFlightsService
         [JsonRpcMethod("search_tickets")]
         public object search_tickets(params object[] args)
         {
-            HttpContext.Current.Request[
+        
 		    SF_service sf_service = new SF_service();
 
 		    Random rand = new Random(100);

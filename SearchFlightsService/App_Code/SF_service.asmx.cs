@@ -22,6 +22,27 @@ namespace SearchFlightsService
     // [System.Web.Script.Services.ScriptService]
     public class SF_service : System.Web.Services.WebService
     {
+        public SF_service()
+        {
+            if (ConfigurationManager.AppSettings["TOTAL_COEF"] != null)
+            {
+                try
+                {
+
+                    TOTAL_COEF = Convert.ToDecimal(ConfigurationManager.AppSettings["TOTAL_COEF"]);
+                }
+                catch (Exception ex) { }
+            }
+        }
+
+        private string secret_key = WebConfigurationManager.AppSettings["SecretKey"];
+
+        private int searchResultTimeout = 1200; //время в секундах, в течение которого не будет делаться новый поиск при аналогичном запросе
+        private int searchFullTimeout = 60; //время в секундах, в течение которого ожидается результат
+
+        public static decimal TOTAL_COEF = 1;
+
+
         private int searchResultTimeout = 1200; //время в секундах, в течение которого не будет делаться новый поиск при аналогичном запросе
         private int searchFullTimeout = 60; //время в секундах, в течение которого ожидается результат
 
@@ -165,11 +186,11 @@ namespace SearchFlightsService
 
                         //если еще не получен результат, пробуем получить от Портбилет
                         if (flightsPort == null)
-                            flights = psrvc.Get_Flights(psrvc.SearchId);
+                            flights = psrvc.GetFlights(psrvc.SearchId);
 
                         //если еще не получен результат, пробуем получить от Энивэй
                         if (flightsAwad == null)
-                            flights = awad_srvc.Get_Flights(awad_search_id);
+                            flights = awad_srvc.GetFlights(awad_search_id);
 
                         //если получили оба, уходим
                         if (flights != null) break;
@@ -269,15 +290,15 @@ namespace SearchFlightsService
 
                     //если еще не получен результат, пробуем получить от Портбилет
                     if (flightsPort == null)
-                        flightsPort = psrvc.Get_Flights(psrvc.SearchId);
+                        flightsPort = psrvc.GetFlights(psrvc.SearchId);
 
                     //если еще не получен результат, пробуем получить от Энивэй
                     if (flightsAwad == null)
-                        flightsAwad = awad_srvc.Get_Flights(awad_search_id);
+                        flightsAwad = awad_srvc.GetFlights(awad_search_id);
 
                     //если еще не получен результат, пробуем получить от Визита
                     if (flightsVizit == null)
-                        flightsVizit = vsrvc.Get_Flights("");
+                        flightsVizit = vsrvc.GetFlights("");
 
                     //если получили оба, уходим
                     if ((flightsPort != null) && (flightsAwad != null) && (flightsVizit != null))
@@ -412,7 +433,7 @@ namespace SearchFlightsService
                     //берем результаты от портбилет
                     if ((res_flights == null) && (psrvc != null))
                     {
-                        res_flights = psrvc.Get_Flights(psrvc.SearchId);
+                        res_flights = psrvc.GetFlights(psrvc.SearchId);
 
                         //если поиск уже завершен
                         if (res_flights != null)
@@ -438,7 +459,7 @@ namespace SearchFlightsService
                     //берем результаты от Визита
                     if ((res_flights == null) && (vsrvc != null))
                     {
-                        res_flights = vsrvc.Get_Flights("");
+                        res_flights = vsrvc.GetFlights("");
 
                         //если поиск уже завершен
                         if (res_flights != null)
@@ -532,7 +553,7 @@ namespace SearchFlightsService
                         if (service[i] != null)
                         {
                             //пробуем забрать найденные перелеты
-                            new_flights[i] = service[i].Get_Flights(searchId);
+                            new_flights[i] = service[i].GetFlights(searchId);
 
                             //если поиск закончился и перелеты есть
                             if (new_flights[i] != null)
@@ -809,7 +830,6 @@ namespace SearchFlightsService
             {
                // return GetFlightByTicketId(Convert.ToInt64(flightToken));
 
-
                 if (flightToken.IndexOf("vt_") == 0)
                     return GetFlightInfo(flightToken);
 
@@ -826,6 +846,7 @@ namespace SearchFlightsService
                             AwadService aws = new AwadService();
                             item.TimeLimit = aws.Get_Fare_TimeLimit(flightToken);
                         }
+                        
                         return item;
                     }
             }
