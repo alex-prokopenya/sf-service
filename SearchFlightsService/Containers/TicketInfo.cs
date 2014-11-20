@@ -7,9 +7,9 @@ namespace SearchFlightsService.Containers
 {
     public class TicketInfo
     {
-        private int _rubPrice;
+        private decimal _rubPrice;
 
-        public int RubPrice
+        public decimal RubPrice
         {
             get { return _rubPrice; }
             set { _rubPrice = value; }

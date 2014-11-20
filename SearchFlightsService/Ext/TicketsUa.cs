@@ -9,7 +9,10 @@ using System.Net;
 using System.Xml;
 using SearchFlightsService.Logger;
 using System.Web.Configuration;
-
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Text;
 
 namespace SearchFlightsService.Ext
 {
@@ -26,6 +29,7 @@ namespace SearchFlightsService.Ext
         
         private const string TKTS_book = "/avia/book.xml?";
 
+        private const string TKTS_balance = "/payment/balance?";
         private const string TKTS_confirm = "/payment/commit?";
 
         private const string TKTS_booking_details = "/avia/bookings_list.xml?";
@@ -33,6 +37,14 @@ namespace SearchFlightsService.Ext
         private const string TKTS_get_ticket = "/avia/eticket.json?";
 
         private const string TKTS_service = "avia";
+
+        private const string userLogin = "al.prokopenya@gmail.com";
+
+        private const string userPassword = "1loIbaR4";
+
+        private const string TKTS_shop_api_key = "dbb95b76-4145-4e8b-88af-9d79cb63c96f";
+        private const string TKTS_shop_secret_key = "HYP7O5kXRjGPRVRK";
+
         #endregion
 
         #region Fields
@@ -140,74 +152,223 @@ namespace SearchFlightsService.Ext
                                     item.Date);
         }
 
-        public string BookFlight(string flightId, Customer customer, Passenger[] passengers)
+        public FileContainer[] SaveTicketToTempFolder(string bookId)
         {
-            string[] arr = flightId.Replace("~", "_").Split('_');
-            string requestStr = "R=" + arr[1] + "&F=" + arr[2] + "&V=" + arr[3].Replace("^", ";").TrimEnd(new char[] { ';' });
-            string customerSrt = "&Phone=" + customer.Phone + "&Email=" + customer.Mail + "&PhoneCountry=RU|7&PersonalEmail=it@viziteurope.eu";
-
-            requestStr += customerSrt;
-
-            for (int i = 0; i < passengers.Length; i++)
-            {
-                if (passengers[i].Citizen.Length > 2)
-                    passengers[i].Citizen = passengers[i].Citizen.Substring(2);
-
-                requestStr += "&FName" + (i + 1) + "=" + passengers[i].Name +
-                              "&LName" + (i + 1) + "=" + passengers[i].Fname +
-                              "&PCountry" + (i + 1) + "=" + passengers[i].Citizen +
-                              "&G" + (i + 1) + "=" + passengers[i].Gender +
-                              "&BDate" + (i + 1) + "=" + passengers[i].Birth.ToString("dd.MM.yyyy") +
-                              "&PNumber" + (i + 1) + "=" + passengers[i].Pasport +
-                              "&PExpDate" + (i + 1) + "=" + passengers[i].Passport_expire_date.ToString("dd.MM.yyyy");
-
-                if ((passengers[i].FrequentFlyerAirline != null) && (passengers[i].FrequentFlyerNumber != null) && (passengers[i].FrequentFlyerAirline.Length * passengers[i].FrequentFlyerNumber.Length != 0))
-                    requestStr += "&FrequentFlyerAirline" + (i + 1) + passengers[i].FrequentFlyerAirline +
-                                   "&FrequentFlyerNumber" + (i + 1) + passengers[i].FrequentFlyerNumber;
-            }
-
-            XmlDocument xDoc = new XmlDocument();
-            string content = "";// makeHttpRequest(TKTS_service_uri + AWAD_CreateReservation + requestStr, 80);
             try
             {
-                //content = ;
-                xDoc.LoadXml(content);
+                string orderId = bookId.Replace("tk_", "");
 
-                Logger.Logger.WriteToBookLog("SEND BookRequest " + requestStr + "Create Reservation response: " + content);
+                string path_template = "https://old.anywayanyday.com/en/order/receipt/?Compact=True&OrderId={order_id}";
+                string url = path_template.Replace("{order_id}", orderId);
+
+                string file_path = this.ticket_folder + "\\" + bookId + ".html";
+                StreamWriter sw = new StreamWriter(file_path);
+
+                WebClient wcl = new WebClient();
+                string ticket = wcl.DownloadString(url);
+
+                ticket = ticket.Replace("/images/logo_text.png", "http://clickandtravel.ru/rg_images/logo_clickandtravel.png")
+                               .Replace("anywayanyday.com", "clickandtravel.ru")
+                               .Replace("anywayanyday", "clickandtravel")
+                               .Replace("width=\"288\"", "")
+                               .Replace("class=\"for_print\" style=\"", "class=\"for_print\" style=\"font-size:260%; padding: 0 5px 5px 0; font-weight: bold; font-family: Tahoma, sans-serif; color#333\">www.clickandtravel.ru</div><div style=\"display:none;")
+                               .Replace("/images/icoPrint_white.gif", "http://clickandtravel.ru/rg_images/icoPrint_white.gif")
+                               .Replace("\">Print</", "font-size:150%\">Распечатать</")
+                               .Replace("<span style=\"color:#F04B7D;\">any</span><span style=\"color:#323741\">way</span><span style=\"color:#F04B7D;\">any</span><span style=\"color:#323741\">day</span>", "<img src=\"http://clickandtravel.ru/rg_images/logo_clickandtravel.png\"/>")
+                               .Replace("height=\"50\"", "");
+
+                sw.Write(ticket);
+                sw.Flush();
+                sw.Close();
+
+                return new FileContainer[] { new FileContainer() { FilePath = file_path, FileTitle = "Авиабилет" } };
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.WriteToLog("save ticket exception: " + ex.Message + "\n" + ex.StackTrace);
+                return new FileContainer[0];
+            }
+        }
+
+        public TicketInfo GetTicketInfo(string bookId)
+        {
+            //авторизоваться
+            var authToken = AuthUser(userLogin, userPassword);
+
+            //получить инфо о заказах
+            string orderId = bookId.Replace("tk_", "");
+
+            var request = TKTS_service_uri + TKTS_booking_details + "key=" + TKTS_key;
+            request += "&auth_key=" + authToken;
+            request += "&locator=" + orderId;
+
+            XmlDocument orderDoc = new XmlDocument();
+            orderDoc.LoadXml(makeHttpRequest(request));
+
+            XmlNodeList orderList = orderDoc.GetElementsByTagName("booking");
+
+            if (orderList.Count == 0) return null;
+
+            XmlElement orderElement = (orderList[0] as XmlElement);
+
+            //получить стоимость
+            decimal total_price = Convert.ToDecimal(orderElement.GetElementsByTagName("UAH")[0].InnerText.Replace(".", ","));
+
+            string turist_name = orderElement.GetElementsByTagName("lastname")[0].InnerText;
+            string route_from = orderElement.GetElementsByTagName("departure-location")[0].InnerText;
+            string route_to = "/";
+
+            //количество туристов
+            int tst_count = orderElement.GetElementsByTagName("passenger").Count;
+
+            //статус заказа
+            bool isBooking = (orderElement.GetElementsByTagName("status")[0].InnerText == "W");
+
+            return new TicketInfo()
+            {
+                MainTurist = turist_name,
+                TuristCount = tst_count,
+                RouteFrom = route_from,
+                RouteTo = route_to,
+                RubPrice = total_price,
+                IsBooking = isBooking
+            };
+        }
+
+        public decimal GetUsersBalance()
+        {
+             var request = TKTS_service_uri + TKTS_balance + "key=" + TKTS_key + "&service=avia";
+
+             XmlDocument orderDoc = new XmlDocument();
+             orderDoc.LoadXml(makeHttpRequest(request));
+
+             string strAmount = (orderDoc.GetElementsByTagName("balance")[0] as XmlElement).GetAttribute("amount").Replace(".", ",");
+
+             decimal amount = Convert.ToDecimal(strAmount);
+
+             return amount;
+        }
+
+        public string BuyTicket(string bookId)
+        {
+            string orderId = bookId.Replace("tk_", "");
+
+            //авторизоваться
+            var authToken = AuthUser(userLogin, userPassword);
+
+            //получить инфо о заказе
+            var ticketInfo = GetTicketInfo(bookId);
+
+            if (!ticketInfo.IsBooking)
+                return "Error. Check order status ";
+
+            var balance = GetUsersBalance();
+
+            if (balance >= ticketInfo.RubPrice)
+            {
+                string request = TKTS_service_uri + TKTS_confirm + "key=" + TKTS_key;
+                string amount = Math.Round(ticketInfo.RubPrice, 2).ToString().Replace(",", ".");
+
+                string signCandidate = TKTS_shop_api_key + "avia" + orderId + amount + TKTS_shop_secret_key;
+                string sign = CalculateMD5Hash(signCandidate).ToLower();
+
+                request += "&service=avia";
+                request += "&order_id=" + orderId;
+                request += "&amount=" + amount;
+                request += "&signature=" + sign;
+
+                var response = makeHttpRequest(request);
+
+                XmlDocument orderDoc = new XmlDocument();
+                orderDoc.LoadXml(makeHttpRequest(request));
+
+                var state = (orderDoc.GetElementsByTagName("order")[0] as XmlElement).GetAttribute("paid");
+
+                if(state == "true")
+                    return "Success";
+                else
+                    return "Error. " + response;
+            }
+            else
+                return "Error. Check balance";
+        }
+
+        public string BookFlight(string flightId, Customer customer, Passenger[] passengers, DateTime tour_end_date)
+        {
+            var idParts = flightId.Split('_');
+
+            if (idParts.Length < 3) 
+                throw new SearchFlightException("BookRequest Error: wrong flight id " + flightId );
+
+            var authToken = AuthUser(userLogin, userPassword);
+
+            ///avia/book.xml?&passengers[0][type]=ххх&passengers[0][firstname]=хххххх&passengers[0][lastname]=хххххх&passengers[0][birthday]=хх-хх-хххх&passengers[0][gender]=х&passengers[0][citizenship]=хх&passengers[0][docnum]=ххххххххх&passengers[0][doc_expire_date]=ххххххххх&passengers[0][bonus_card]=ххххххххх
+            ///
+            string request = TKTS_service_uri + TKTS_book + "key=" + TKTS_key;
+
+            request += "&session_id=" + idParts[1];
+            request += "&recommendation_id=" + flightId.Replace("tk_" + idParts[1] + "_", "");
+            request += "&auth_key=" + authToken;
+
+            for (int i=0; i<passengers.Length; i++)
+                request += ConvertPassengerToRequest(passengers[i], i, tour_end_date);
+
+            var response = makeHttpRequest(request);
+
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.LoadXml(response);
+
+            try
+            {
+                var orderId = xDoc.GetElementsByTagName("locator")[0].InnerText;
+                return "tk_" + orderId;
             }
             catch (Exception)
             {
-                Logger.Logger.WriteToBookLog("EXCEPTION: BookRequest" + requestStr + "Create Reservation Error " + content);
-
-                throw new SearchFlightException("BookRequest" + requestStr + "Create Reservation Error " + content);
+                throw new SearchFlightException("BookRequest " + request + " Create Reservation Error " + xDoc.InnerXml);
             }
+        }
 
-            XmlNodeList nList = xDoc.GetElementsByTagName("CreateReservation");
+        private static string ConvertPassengerToRequest(Passenger ps, int index, DateTime tour_end_date)
+        {
+            string request = "";
 
-            if (nList.Count == 0) throw new SearchFlightException("BookRequest" + requestStr + "Create Reservation Error " + xDoc.InnerXml);
+            request += "&passengers[" + index + "][type]=" + GetPasengerType(ps.Birth, tour_end_date);
 
-            if ((nList.Count == 1) && ((nList[0] as XmlElement).HasAttribute("OrderId")))
+            request += "&passengers[" + index + "][firstname]=" + ps.Name;
+            request += "&passengers[" + index + "][lastname]=" + ps.Fname;
+            request += "&passengers[" + index + "][birthday]=" + ps.Birth.ToString("dd-MM-yyyy");
+            request += "&passengers[" + index + "][gender]=" + ps.Gender;
+            request += "&passengers[" + index + "][citizenship]=" + ps.Citizen;
+            request += "&passengers[" + index + "][docnum]=" + ps.Pasport;
+
+            if (ps.PassportExpireDate > DateTime.Today)
             {
-                string orderId = (nList[0] as XmlElement).GetAttribute("OrderId").ToString();
-
-                XmlDocument orderDoc = new XmlDocument();
-            //    orderDoc.LoadXml(makeHttpRequest(TKTS_service_uri + AWAD_Order + orderId));
-                XmlNodeList orderList = orderDoc.GetElementsByTagName("Order");
-
-                if ((orderList[0] as XmlElement).GetAttribute("OrderAlreadyExists").ToString() == "true")
-                {
-                    Logger.Logger.WriteToBookLog("ALREADY EXISTS!!");
-                    return "can not book";
-                }
-                //узнать таймлимит
-
-                return "aw_" + (orderList[0] as XmlElement).GetAttribute("IdentifierNumber").ToString() + "@@@" + orderId;
+                request += "&passengers[" + index + "][doc_expire_date]=" + ps.PassportExpireDate.ToString("dd-MM-yyyy");
+                request += "&passengers[" + index + "][doctype]=PSP";
             }
             else
-                if ((nList[0] as XmlElement).GetAttribute("Error").ToString() == "CANT_CREATE_RESERVATION")
-                    return "can not book";
+                request += "&passengers[" + index + "][doctype]=PS";
 
-            throw new SearchFlightException("BookRequest" + requestStr + "Create Reservation Error " + xDoc.InnerXml);
+            if ((ps.FrequentFlyerNumber.Length > 2) && (ps.FrequentFlyerNumber.Length < 41))
+                request += "&passengers[" + index + "][bonus_card]=" + ps.FrequentFlyerNumber;
+
+            //request += "type=" + GetPasengerType(ps.Birth, tour_end_date);
+
+
+            return request;
+        }
+
+        private static string GetPasengerType(DateTime birthDate, DateTime tour_end_date)
+        {
+            string type = "ADT";
+
+            if ((tour_end_date - birthDate).Days / 365.25 < 2)
+                type = "INF";
+            else if ((tour_end_date - birthDate).Days / 365.25 < 12)
+                type = "CHD";
+
+            return type;
         }
 
         public int GetTimelimit(string order_number)
@@ -276,9 +437,32 @@ namespace SearchFlightsService.Ext
         #endregion
 
         #region Private methods
-        private string AuthUser(string login, string password)
+        public string AuthUser(string login, string password)
         {
-            return "";
+            string request = TKTS_service_uri + TKTS_signin + "key=" + TKTS_key;
+
+            request += string.Format("&email={0}&password={1}", login, password);
+
+            var resp = makeHttpRequest(request);
+
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.LoadXml(resp);
+
+            if (xDoc.GetElementsByTagName("auth_key").Count > 0)
+                return xDoc.GetElementsByTagName("auth_key")[0].InnerText;
+
+            throw new SearchFlightException("AuthRequest " + request + "  Error " + xDoc.InnerXml);
+        }
+
+        public  string CreateUser(string login)
+        {
+            string request = TKTS_service_uri + TKTS_signup + "key=" + TKTS_key;
+
+            request += string.Format("&email={0}&phone={1}&name={2}", login,"375295579176","cat");
+
+            var resp = makeHttpRequest(request);
+
+            return resp;
         }
 
         private class MyWebClient : WebClient
@@ -406,5 +590,21 @@ namespace SearchFlightsService.Ext
             return leg;
         }
         #endregion
+
+        public static string CalculateMD5Hash(string input)
+        {
+            // step 1, calculate MD5 hash from input
+            MD5 md5 = MD5.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = md5.ComputeHash(inputBytes);
+
+            // step 2, convert byte array to hex string
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+            return sb.ToString();
+        }
     }
 }

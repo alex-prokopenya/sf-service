@@ -9,9 +9,10 @@ using System.Collections;
 using SearchFlightsService.PortbiletWebService;
 using System.Threading;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Web.Configuration;
-using System.Text.RegularExpressions;
+
 using System.Configuration;
 
 namespace SearchFlightsService.Ext
@@ -384,7 +385,7 @@ namespace SearchFlightsService.Ext
                         birthdaySpecified = true,
                         citizenship = new DictionaryItem() { code = passengers[i].Citizen.Substring(2) },
 
-                        expired = passengers[i].Passport_expire_date,
+                        expired = passengers[i].PassportExpireDate,
                         expiredSpecified = true,
 
                         firstName = passengers[i].Name,

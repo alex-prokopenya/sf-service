@@ -1,4 +1,4 @@
-﻿<%@ WebHandler Language="C#" Class="SearchFlightsService.AviaApi" debug="true" %>
+﻿<%@ WebHandler Language="C#" Class="SearchFlightsService.AviaApi" %>
 
 namespace SearchFlightsService
 {
@@ -18,7 +18,7 @@ namespace SearchFlightsService
     using System.IO;
     using System.IO.Compression;
     using System.Text;
-    using SF_service;
+   // using SF_service;
     using Core;
     
     public class AviaApi: JsonRpcHandler
@@ -27,8 +27,7 @@ namespace SearchFlightsService
         {
             try
             {
-                
-                StreamWriter outfile = new StreamWriter("" + AppDomain.CurrentDomain.BaseDirectory + @"/check_log/" + DateTime.Today.ToString("yyyy-MM-dd") + ".log", true);
+                StreamWriter outfile = new StreamWriter("" + AppDomain.CurrentDomain.BaseDirectory + @"/check_log/" + DateTime.Now.ToString("yyyy-MM-dd_HH") + ".log", true);
                 {
 		            outfile.WriteLine("");
 		            outfile.WriteLine("_________________________");
@@ -41,7 +40,7 @@ namespace SearchFlightsService
         }
 
 
-	private static int  RAMBLER_MARGIN  = 10;
+	private static int  RAMBLER_MARGIN  = 0;
 		
         private void checkGzip()
         {
@@ -123,17 +122,29 @@ namespace SearchFlightsService
             foreach (string str in HttpContext.Current.Request.Headers.AllKeys)
                 headers += ", " + str;
 
-            JsonObject jo = new JsonObject(new string[] { "api_version", "profile", "version", "contact" }, new string[] { "2", "dev", "1", "it@viziteurope.eu" });
+            JsonObject jo = new JsonObject(new string[] { "api_version", "profile", "version", "contact" }, new string[] { "sf 2", "dev", "1", "it@viziteurope.eu" });
             return jo;
         }
         
         [JsonRpcMethod("search_tickets")]
         public object search_tickets(params object[] args)
         {
-        
+
+			string  inp_text=HttpContext.Current.Request.Url.AbsolutePath;
+
+            WriteToLog(inp_text);
+			double apply_margin =  1;/// 0.982;//1.02040816; 
+			
+			if ((inp_text.Contains("buruki")))// && ( HttpContext.Current.Request["buruki"] !=null))
+				apply_margin = 1 / 0.982;
+			
+            			
+			if ((inp_text.Contains("momondo")))// && ( HttpContext.Current.Request["buruki"] !=null))
+			    return new JsonArray();
+		
 		    SF_service sf_service = new SF_service();
 
-		    Random rand = new Random(100);
+		    Random rand = new Random();
 
             JsonArray inp = new JsonArray();
             foreach(object item in args)
@@ -166,6 +177,7 @@ namespace SearchFlightsService
             Route route = new Route();
             route.Segments = new RouteSegment[query.QuerySegments.Length];
             
+		    string str_route = "";
             //добавляем маршрут перелета
             for(int i=0; i < query.QuerySegments.Length; i++)
             {
@@ -173,117 +185,64 @@ namespace SearchFlightsService
                     
                 string ap_from = qs.from;
 
-               // if (ap_from.Length != 3) 
-              //      ap_from = DataStore.GetIataCodeByIcao(ap_from);
-              //  else
-              //      ap_from = DataStore.CheckPoint(ap_from);
-
-               // if (ap_from == "Not Found") throw new RamblerAviaException("неизвестные коды точек маршрута " + ap_from  + qs.from, 32011);
-
-                //..аэропорт прилета
                 string ap_to = qs.to;
 
-               // if (ap_to.Length != 3) 
-               //     ap_to = DataStore.GetIataCodeByIcao(ap_to);
-               // else
-                //    ap_to = DataStore.CheckPoint(ap_to);
-
-              //  if (ap_to == "Not Found") throw new Core.RamblerAviaException("неизвестные коды точек маршрута" + ap_from +" - " + ap_to, 32011);
                 
-                 route.Segments[i] = new RouteSegment(){Date = Convert.ToDateTime("" + qs.date[0] + "-" + qs.date[1] + "-" + qs.date[2]),
+                route.Segments[i] = new RouteSegment(){Date = Convert.ToDateTime("" + qs.date[0] + "-" + qs.date[1] + "-" + qs.date[2]),
                                                         LocationBegin = ap_from,
                                                         LocationEnd = ap_to};
+		        str_route = ap_from + "-"  + ap_to + " " + qs.date[0] + "-" + qs.date[1] + "-" + qs.date[2] + " / ";
             }
-            DateTime beg = DateTime.Now;
-            SearchResultFlights srf = sf_service.Search_Full_Momondo(route, query.Adults, (query.Children + query.Infants), query.InfantsWithoutSeat, query.CabinClass, "true");
-            DateTime end = DateTime.Now;
 
+			JsonArray json_tickets = new JsonArray(); //создаем пустой массив для результатов
 
-            decimal apply_margin = 1M;
-            
-            if(HttpContext.Current.Request.Url.AbsolutePath.Contains("buruki"))
-                apply_margin = 0.98M;
-            
-            JsonArray json_tickets = new JsonArray();
-            foreach (Flight fl in srf.Flights)
-            {
-               // Ticket ticket = FlightToTicket(fl);
-                fl.Price = Convert.ToInt32(Math.Round(fl.Price / apply_margin));
-                JsonArray ticket_arr = fl.ToJsonArray();
+			try{
+						DateTime beg = DateTime.Now;
+						SearchResultFlights srf = sf_service.Search_Full_Momondo(route, query.Adults, (query.Children + query.Infants), query.InfantsWithoutSeat, query.CabinClass, "true");
+						DateTime end = DateTime.Now;
+						
+					
+						foreach (Flight fl in srf.Flights)
+						{
+							try
+							{
+								JsonArray ticket_arr = fl.ToJsonArray();
+								ticket_arr[1]  = Convert.ToInt32(Math.Round((Convert.ToDouble(fl.Price) * ( apply_margin )))) - 60;
+								ticket_arr.Add("/api/avia/Base.php?Link=" + srf.RequestId + "`" + fl.Id + "&ravia={mark}");
+								json_tickets.Add(ticket_arr);
+							}
+							catch(Exception){}
+						}
+					
+						try{
+							 WriteToLog("started at " +beg.ToString("mm:ss fff") + " ended at " + end.ToString("mm:ss fff"));// + " margin  " + apply_margin + " uri " + HttpContext.Current.Request.Url.AbsolutePath);		
+						}
+						catch(Exception)
+						{}
+			}
+			catch(Exception ex)
+			{
+				WriteToLog(str_route+ "search exception: " + ex.Message);
+				return  new JsonArray();
+			}
 
-                
-                
-                ticket_arr.Add("/api/avia/Base.php?Link=" + srf.RequestId + "`" + fl.Id + "&ravia={mark}");
-                json_tickets.Add(ticket_arr);
-            }
-	//
-        //    DateTime end = DateTime.Now;
-		
-	        try{
-		         WriteToLog("started at " +beg.ToString("mm:ss fff") + " ended at " + end.ToString("mm:ss fff"));		
-	        }
-	        catch(Exception)
-	        {}
+    	    WriteToLog("search " + str_route + " -> " + json_tickets.Count );
 
-            return "ok";//json_tickets;
+            return json_tickets;
         }
-
-        private Ticket FlightToTicket(global::SF_service.Flight flight)
-        {
-            Ticket ticket = new Ticket();
-            //ticket.Price = flight.Price;
-	    	ticket.Price = flight.Price - RAMBLER_MARGIN;
-            ticket.Route = new Route();
-            ticket.Route.Segments = new Segment[flight.Parts.Length];
-
-            for (int i = 0; i < flight.Parts.Length; i++)
-            {
-                FlightPart part = flight.Parts[i];
-                Segment segment = new Segment();
-                segment.Flights = new Flight[part.Legs.Length];
-                
-                for (int j = 0; j < part.Legs.Length; j++)
-                {
-                    Leg leg = part.Legs[j];
-                    Flight ticketFlight = new Flight();
-                    ticketFlight.AirlineCode = leg.Airline;
-                    ticketFlight.ArrivalAirport = leg.LocationEnd;
-                    ticketFlight.BookingClass = leg.BookingClass;
-                    ticketFlight.CabinClass = leg.ServiceClass;
-                    ticketFlight.DepartureAirport = leg.LocationBegin;
-                    ticketFlight.Duration = leg.Duration;
-                    ticketFlight.FlightNumber = leg.FlightNumber;
-                    ticketFlight.PlaneCode = leg.Board;
-                    ticketFlight.ArrivalDateTime = DateToIntArray(leg.DateEnd);
-                    ticketFlight.DepartureDateTime = DateToIntArray(leg.DateBegin);
-
-                    segment.Flights[j] = ticketFlight;
-                }
-                ticket.Route.Segments[i] = segment;
-            }
-            return ticket;
-        }
-
-        private int[] DateToIntArray(DateTime date)
-        {
-            string strDate = date.ToString("yyyy MM dd HH mm");
-            string[] strArray = strDate.Split(' ');
-
-            int[] res = new int[strArray.Length];
-            
-            for(int i=0; i<strArray.Length; i++)
-                res[i] = Convert.ToInt32(strArray[i]);
-
-            return res;
-        }
-
+       
+	[JsonRpcMethod("get_domain")]
+    public object get_domain(params object[] args)
+   	{
+		WriteToLog("i'm here" );
+		return HttpContext.Current.Request.Url.AbsoluteUri + "!!!";
+	}
+	   
+	   
     [JsonRpcMethod("check_availability")]
     public object check_availability(params object[] args)
     {
-
-       // HttpContext.Current.Request.Url.AbsolutePath;
-        
-	    //	throw new Exception("stop");
+	    	throw new Exception("stop");
 	    try{
                 Ticket_reduced[] tickets = new Ticket_reduced[args.Length];
 
@@ -300,19 +259,18 @@ namespace SearchFlightsService
 
                 PriceLink[] links = sf_service.CheckFlights(hashes);
 
+				
+				//decimal apply_margin = 1M;
 
-                decimal apply_margin = 1M;
-
-                if (HttpContext.Current.Request.Url.AbsolutePath.Contains("buruki"))
-                    apply_margin = 0.98M;
-            
-            
+                //if (HttpContext.Current.Request.Url.AbsolutePath.Contains("buruki"))
+                //    apply_margin = 0.98M;
+				
                 JsonArray res = new JsonArray();
                 foreach (PriceLink link in links)
                     if (link == null)
                         res.Add(JsonNull.Value);
                     else
-                        res.Add(new object[] { Math.Round(link.Price / apply_margin) - RAMBLER_MARGIN, "http://www.clickandtravel.ru/api/avia/Base.php?Link=" + link.Link + "&ravia={mark}" });
+                        res.Add(new object[] { (link.Price ) - RAMBLER_MARGIN, "http://www.clickandtravel.ru/api/avia/Base.php?Link="+ link.Link + "&ravia={mark}" });
 
 	            WriteToLog(res.ToString());
 
@@ -370,6 +328,7 @@ namespace SearchFlightsService
         [JsonRpcMethod("list_bookings")]
         public object list_bookings(object[] date1, object[] date2)
         {
+		return null;
             if (!CheckAuth())
             {
                 HttpResponse Response = HttpContext.Current.Response;

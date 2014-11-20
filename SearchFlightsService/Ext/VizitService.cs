@@ -588,7 +588,7 @@ namespace SearchFlightsService.Ext
 
             tst.PasportNum = iTst.Pasport.Substring(2);
             tst.PasportType = iTst.Pasport.Substring(0, 2);
-            tst.PasportDateEnd = iTst.Passport_expire_date;
+            tst.PasportDateEnd = iTst.PassportExpireDate;
 
             tst.DogovorCode = dog.Code;
             tst.DogovorKey = dog.Key;

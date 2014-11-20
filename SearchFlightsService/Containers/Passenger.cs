@@ -100,7 +100,7 @@ namespace SearchFlightsService.Containers
         }
         private DateTime passport_expire_date = DateTime.MinValue;
 
-        public DateTime Passport_expire_date
+        public DateTime PassportExpireDate
         {
             get { return passport_expire_date; }
             set

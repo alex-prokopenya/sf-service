@@ -9,6 +9,7 @@ using SearchFlightsService.Core;
 using SearchFlightsService.Ext;
 using System.Threading;
 using System.Web.Configuration;
+using SearchFlightsService.DB;
 
 namespace SearchFlightsService
 {
@@ -24,12 +25,12 @@ namespace SearchFlightsService
     {
         public SF_service()
         {
-            if (ConfigurationManager.AppSettings["TOTAL_COEF"] != null)
+            if (WebConfigurationManager.AppSettings["TOTAL_COEF"] != null)
             {
                 try
                 {
 
-                    TOTAL_COEF = Convert.ToDecimal(ConfigurationManager.AppSettings["TOTAL_COEF"]);
+                    TOTAL_COEF = Convert.ToDecimal(WebConfigurationManager.AppSettings["TOTAL_COEF"]);
                 }
                 catch (Exception ex) { }
             }
@@ -41,11 +42,7 @@ namespace SearchFlightsService
         private int searchFullTimeout = 60; //время в секундах, в течение которого ожидается результат
 
         public static decimal TOTAL_COEF = 1;
-
-
-        private int searchResultTimeout = 1200; //время в секундах, в течение которого не будет делаться новый поиск при аналогичном запросе
-        private int searchFullTimeout = 60; //время в секундах, в течение которого ожидается результат
-
+     
         //метод для проверки маршрута:
         //если маршрут строго по СНГ, не ведем поиск по энивэй
 
@@ -126,6 +123,10 @@ namespace SearchFlightsService
 
 
                 AwadService awad_srvc = new AwadService();
+
+                if (!is_one_way)
+                    awad_srvc.SetCoef(0.97M); 
+
                 string awad_search_id = "";
                 Flight[] flightsAwad = null;
 
@@ -185,8 +186,8 @@ namespace SearchFlightsService
                         Thread.Sleep(1000);
 
                         //если еще не получен результат, пробуем получить от Портбилет
-                        if (flightsPort == null)
-                            flights = psrvc.GetFlights(psrvc.SearchId);
+                   //     if (flightsPort == null)
+                    //        flights = psrvc.GetFlights(psrvc.SearchId);
 
                         //если еще не получен результат, пробуем получить от Энивэй
                         if (flightsAwad == null)
@@ -258,9 +259,9 @@ namespace SearchFlightsService
                 //если данных в кэше нет, делаем новый поиск
 
                 //starting portbilet
-                PortbiletService psrvc = new PortbiletService(route, adult, children, inf, serviceClass);
-                Thread portObj = new Thread(new ThreadStart(psrvc.InitSearch));
-                portObj.Start();
+              //  PortbiletService psrvc = new PortbiletService(route, adult, children, inf, serviceClass);
+               // Thread portObj = new Thread(new ThreadStart(psrvc.InitSearch));
+              // portObj.Start();
 
                 Flight[] flightsPort = null;
 
@@ -289,8 +290,8 @@ namespace SearchFlightsService
                     Thread.Sleep(3000);
 
                     //если еще не получен результат, пробуем получить от Портбилет
-                    if (flightsPort == null)
-                        flightsPort = psrvc.GetFlights(psrvc.SearchId);
+              //      if (flightsPort == null)
+                //        flightsPort = psrvc.GetFlights(psrvc.SearchId);
 
                     //если еще не получен результат, пробуем получить от Энивэй
                     if (flightsAwad == null)
@@ -371,21 +372,15 @@ namespace SearchFlightsService
                 }
                 //if have no saved results, make new search
 
-
-
                 //начинаем поиск в энивэй
                 AwadService awad_srvc = new AwadService();
                 string awad_search_id = awad_srvc.InitSearch(route, adult, children, inf, serviceClass);
 
-                PortbiletService psrvc = null;
                 VizitService vsrvc = null;
-                //начинаем поиск в портбилет
-              psrvc = new PortbiletService(route, adult, children, inf, serviceClass);
-                Thread portObj = new Thread(new ThreadStart(psrvc.InitSearch));
-                portObj.Start();
+              
                
                 //начинаем поиск в визите
-              vsrvc = new VizitService(adult, children, inf, serviceClass, route);
+                vsrvc = new VizitService(adult, children, inf, serviceClass, route);
                 Thread vtObj = new Thread(new ThreadStart(vsrvc.InitSearch));
                 vtObj.Start();
               
@@ -395,11 +390,9 @@ namespace SearchFlightsService
 
                 int timer = searchFullTimeout;
                 bool is_awad = false;
-                bool is_port = false;
 
                 int vizit_finished = 0;
                 int awad_finished = 0;
-                int port_finished = 0;
 
                 while (res_flights == null)
                 {
@@ -420,7 +413,6 @@ namespace SearchFlightsService
                                 res_flights = awad_srvc.FaresToFlights(res_fares);
 
                                 is_awad = true;
-                                is_port = false;
                                 break;
                             }
                             else
@@ -430,31 +422,7 @@ namespace SearchFlightsService
                             }
                         }
                     }
-                    //берем результаты от портбилет
-                    if ((res_flights == null) && (psrvc != null))
-                    {
-                        res_flights = psrvc.GetFlights(psrvc.SearchId);
-
-                        //если поиск уже завершен
-                        if (res_flights != null)
-                        {
-                            port_finished = 1;
-                            if (res_flights.Length > 0)
-                            {
-                                //ставим метку, что это не энивэй, а портбилет
-                                is_awad = false;
-                                is_port = true;
-                                //уходим из цикла
-                                break;
-                            }
-                            else
-                            {
-                                psrvc = null;
-                                //  res_fares = null;
-                                res_flights = null;
-                            }
-                        }
-                    }
+                
 
                     //берем результаты от Визита
                     if ((res_flights == null) && (vsrvc != null))
@@ -469,7 +437,6 @@ namespace SearchFlightsService
                             {
                                 //ставим метку, что это не энивэй
                                 is_awad = false;
-                                is_port = false;
                                 //уходим из цикла
                                 break;
                             }
@@ -488,22 +455,13 @@ namespace SearchFlightsService
                 if (is_awad)//если первым был энивэй
                 {
                     //отправляем ждать результаты от портбилет
-                    Thread threadWaitFull = new Thread(() => WaitFinishSearch(new IExternalService[] { psrvc, vsrvc }, my_search_id, res_flights, is_one_way, adult, children, inf));
+                    Thread threadWaitFull = new Thread(() => WaitFinishSearch(new IExternalService[] {  vsrvc }, my_search_id, res_flights, is_one_way, adult, children, inf));
                     threadWaitFull.Start();
-                }
-                else if (is_port) //если поиск от портбилет завершен
-                {
-                    //ждем результатов от энивэя
-                    Thread threadWaitFull = new Thread(() => WaitFinishSearch(new IExternalService[] { awad_srvc, vsrvc }, my_search_id, res_flights, is_one_way, adult, children, inf));
-                    threadWaitFull.Start();
-
-                    //группируем полученные от портбилета flights в fares
-                    res_fares = FlightsToFareProcessor.FlightsToFares(res_flights, is_one_way);
                 }
                 else //если поиск от визита завершен
                 {
                     //ждем результатов от энивэя
-                    Thread threadWaitFull = new Thread(() => WaitFinishSearch(new IExternalService[] { awad_srvc, psrvc }, my_search_id, res_flights, is_one_way, adult, children, inf));
+                    Thread threadWaitFull = new Thread(() => WaitFinishSearch(new IExternalService[] { awad_srvc}, my_search_id, res_flights, is_one_way, adult, children, inf));
                     threadWaitFull.Start();
 
                     //группируем полученные от визита flights в fares
@@ -511,7 +469,7 @@ namespace SearchFlightsService
                 }
                 //new thread
                 //сохраняем полученные предварительные результаты в базу данных
-                DB.DataStore ds = new DB.DataStore(route, adult, children, inf, serviceClass, my_search_id, res_fares, res_flights, awad_finished * port_finished * vizit_finished);
+                DB.DataStore ds = new DB.DataStore(route, adult, children, inf, serviceClass, my_search_id, res_fares, res_flights, awad_finished  * vizit_finished);
                 ds.route_id = my_search_id;
                 Thread threadObj = new Thread(new ThreadStart(ds.SaveResults));
                 threadObj.Start();
@@ -931,6 +889,151 @@ namespace SearchFlightsService
             DB.DataStore ds = new DB.DataStore();
             return ds.CheckTickets(hashes);
         }
+
+        //отдаем информацию о ЗАБРОНИРОВАННОМ перелете -- для сверки ДО выписки
+        [WebMethod]
+        public TicketInfo GetTicketInfo(string bookId)
+        {
+            //проверить оплату
+            //проверить маршрут
+            //проверить стоимость
+            //проверить туристов
+
+            if (bookId.Contains("pb_"))
+            {
+                PortbiletService ps = new PortbiletService();
+                return ps.GetTicketInfo(bookId);
+            }
+            else if (bookId.Contains("aw_"))
+            {
+                AwadService awad_srvc = new AwadService();
+
+                return awad_srvc.GetTicketInfo(bookId);
+            }
+            else
+                return GetTicketInfoByServiceId(bookId);
+        }
+
+        private TicketInfo GetTicketInfoByServiceId(string serviceId)
+        {
+            try
+            {
+                int bookId = Convert.ToInt32(serviceId);
+                string orderId = GetFlightOrderID(bookId);
+
+                if ((orderId.Contains("pb_")) || (orderId.Contains("aw_")))
+                    return GetTicketInfo(orderId);
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.WriteToLog(ex.Message + " " + ex.StackTrace);
+            }
+
+            return null;
+        }
+
+        private string BuyTicketByServiceId(string serviceId)
+        {
+            try
+            {
+                int bookId = Convert.ToInt32(serviceId);
+                string orderId = GetFlightOrderID(bookId);
+
+                if ((orderId.Contains("pb_")) || (orderId.Contains("aw_")))
+                    return BuyTicket(orderId, "inner_secure_sign");
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.WriteToLog(ex.Message + " " + ex.StackTrace);
+            }
+
+            return "Error. Unknown bookId";
+        }
+
+        private string GetFlightOrderID(int bookId) //по book_id получаем ссылку на описание услуги
+        {
+            string serviceID = DataStore.ExecuteQueryToClick("select service_id from click1.dbo.[CATSE_book_id] where book_id = " + bookId);
+
+            string ticketId = DataStore.ExecuteQueryToClick("select ft_ticketid from click1.dbo.[CATSE_Flights] where ft_id = " + serviceID);
+
+            string result = "";
+
+            if (ticketId.Contains("_"))
+                result += ticketId.Substring(0, ticketId.IndexOf("_")) + "_";
+
+            if (ticketId.Contains("@@@"))
+                result += ticketId.Split(new string[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries).Last();
+
+            return result;
+        }
+
+        //выписываем билет
+        [WebMethod]
+        public string BuyTicket(string bookId, string secure_sign)
+        {
+            //checkSign
+            string mySign = PortbiletService.CalculateMD5Hash(bookId + secret_key).ToUpper();
+
+            if ((mySign != secure_sign.ToUpper().Trim()) && (secure_sign != "inner_secure_sign"))
+                return "Error. Wrong sign";
+
+            if (bookId.Contains("pb_"))
+            {
+                PortbiletService ps = new PortbiletService();
+                return ps.BuyTicket(bookId);
+            }
+            else if (bookId.Contains("aw_"))
+            {
+                AwadService awad_srvc = new AwadService();
+
+                return awad_srvc.BuyTicket(bookId);
+            }
+            else
+                return BuyTicketByServiceId(bookId);
+
+        }
+
+
+        private FileContainer[] LoadTicketsByServiceId(string serviceId)
+        {
+            try
+            {
+                int bookId = Convert.ToInt32(serviceId);
+                string orderId = GetFlightOrderID(bookId);
+
+                if ((orderId.Contains("pb_")) || (orderId.Contains("aw_")))
+                    return LoadTickets(orderId);
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.WriteToLog(ex.Message + " " + ex.StackTrace);
+            }
+
+            return new FileContainer[0];
+        }
+
+
+        [WebMethod]
+        public FileContainer[] LoadTickets(string bookId)
+        {
+            //checkSign
+
+            if (bookId.Contains("pb_"))
+            {
+                PortbiletService ps = new PortbiletService();
+                return ps.SaveTicketToTempFolder(bookId);
+            }
+            else if (bookId.Contains("aw_"))
+            {
+                AwadService awad_srvc = new AwadService();
+
+                return awad_srvc.SaveTicketToTempFolder(bookId);
+            }
+            else
+                return LoadTicketsByServiceId(bookId);
+
+        }
+
 
 
         [WebMethod]

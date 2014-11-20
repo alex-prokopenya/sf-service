@@ -35,7 +35,7 @@ namespace SearchFlightsService.DB
         private int isFinished;
 
         private  string ConnectionString = WebConfigurationManager.AppSettings["ClickConnectionString"];// ConfigurationManager.AppSettings["connectionString"];// "Data Source=192.168.0.105;Initial Catalog=avalon;User Id=sa;Password=asd321r";
-
+        private static string ClickConnectionString = WebConfigurationManager.AppSettings["ClickConnectionString"];
 
         private int MySqlDbCount = 0;
 
@@ -1318,6 +1318,21 @@ namespace SearchFlightsService.DB
             {
                 Logger.Logger.WriteToLog("clearing exception: " + ex.Message);   
             }
+        }
+
+
+        public static string ExecuteQueryToClick(string query)
+        {
+            SqlConnection con = new SqlConnection(ClickConnectionString);
+            con.Open();
+
+            SqlCommand com = new SqlCommand(query, con);
+
+            string value = com.ExecuteScalar().ToString();
+
+            con.Close();
+
+            return value;
         }
     }
 }

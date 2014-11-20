@@ -36,6 +36,12 @@ namespace SearchFlightsService.Ext
 
         private decimal TOTAL_COEF = Convert.ToDecimal(ConfigurationManager.AppSettings["TOTAL_COEF"]);
 
+
+        public void SetCoef(decimal coef)
+        {
+            this.TOTAL_COEF = coef;
+        }
+
         #endregion
 
         private string request_id = "";
@@ -66,7 +72,6 @@ namespace SearchFlightsService.Ext
 
             //статус заказа
             bool isBooking = (orderElement.GetAttribute("Status").ToString() == "WaitingCustomerConfirm");
-
 
             return new TicketInfo()
             {
@@ -218,7 +223,7 @@ namespace SearchFlightsService.Ext
                               "&G" + (i + 1) + "=" + passengers[i].Gender +
                               "&BDate" + (i + 1) + "=" + passengers[i].Birth.ToString("dd.MM.yyyy") +
                               "&PNumber" + (i + 1) + "=" + passengers[i].Pasport +
-                              "&PExpDate" + (i + 1) + "=" + passengers[i].Passport_expire_date.ToString("dd.MM.yyyy");
+                              "&PExpDate" + (i + 1) + "=" + passengers[i].PassportExpireDate.ToString("dd.MM.yyyy");
 
                 if ((passengers[i].FrequentFlyerAirline != null) && (passengers[i].FrequentFlyerNumber != null) && (passengers[i].FrequentFlyerAirline.Length * passengers[i].FrequentFlyerNumber.Length != 0))
                     requestStr += "&FrequentFlyerAirline" + (i + 1) + passengers[i].FrequentFlyerAirline +
@@ -259,8 +264,8 @@ namespace SearchFlightsService.Ext
                     return "can not book";
                 }
                 //узнать таймлимит
-
-                return "aw_" + orderId;//+ (orderList[0] as XmlElement).GetAttribute("IdentifierNumber").ToString();
+                return "aw_" + (orderList[0] as XmlElement).GetAttribute("IdentifierNumber").ToString() + "@@@" + orderId;
+               // return "aw_" + orderId;//+ (orderList[0] as XmlElement).GetAttribute("IdentifierNumber").ToString();
             }
             else
                 if ((nList[0] as XmlElement).GetAttribute("Error").ToString() == "CANT_CREATE_RESERVATION")
